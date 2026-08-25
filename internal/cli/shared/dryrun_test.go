@@ -64,6 +64,7 @@ func TestDryRunTransport_InterceptsWriteMethods(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
+			req.Header.Set("Content-Type", "application/json")
 
 			resp, err := transport.RoundTrip(req)
 			if err != nil {
@@ -196,6 +197,7 @@ func TestDryRunTransport_LargeBodyTruncated(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	req.Header.Set("Content-Type", "application/json")
 
 	_, err = transport.RoundTrip(req)
 	if err != nil {
@@ -208,6 +210,45 @@ func TestDryRunTransport_LargeBodyTruncated(t *testing.T) {
 	}
 }
 
+func TestDryRunTransport_OmitsNonTextBodiesByDefault(t *testing.T) {
+	tests := []struct {
+		name        string
+		contentType string
+	}{
+		{name: "image", contentType: "image/png"},
+		{name: "APK", contentType: "application/vnd.android.package-archive"},
+		{name: "multipart upload", contentType: "multipart/related; boundary=upload-boundary"},
+		{name: "unknown", contentType: "application/x-custom-binary"},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			base := &fakeTransport{}
+			var buf bytes.Buffer
+			transport := &DryRunTransport{Base: base, Writer: &buf}
+			req, err := http.NewRequest(http.MethodPost, "https://example.com/upload", strings.NewReader("secret-binary-body"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			req.Header.Set("Content-Type", tc.contentType)
+
+			resp, err := transport.RoundTrip(req)
+			if err != nil {
+				t.Fatal(err)
+			}
+			_ = resp.Body.Close()
+			if base.called {
+				t.Fatal("dry run called base transport")
+			}
+			if strings.Contains(buf.String(), "secret-binary-body") {
+				t.Fatalf("dry-run log exposed non-text body: %q", buf.String())
+			}
+			if !strings.Contains(buf.String(), "body omitted") {
+				t.Fatalf("dry-run log should explain omission: %q", buf.String())
+			}
+		})
+	}
+}
+
 func TestDryRunTransport_SyntheticResponseBody(t *testing.T) {
 	base := &fakeTransport{}
 	var buf bytes.Buffer
@@ -217,6 +258,7 @@ func TestDryRunTransport_SyntheticResponseBody(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := transport.RoundTrip(req)
 	if err != nil {
@@ -247,6 +289,7 @@ func TestDryRunTransport_OutputFormat(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	req.Header.Set("Content-Type", "application/json")
 
 	_, err = transport.RoundTrip(req)
 	if err != nil {

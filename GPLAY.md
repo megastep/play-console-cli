@@ -291,6 +291,7 @@
 - [games achievements create](#games-achievements-create)
 - [games achievements update](#games-achievements-update)
 - [games achievements delete](#games-achievements-delete)
+- [games achievements upload-icon](#games-achievements-upload-icon)
 - [games achievements reset](#games-achievements-reset)
 - [games achievements reset-all](#games-achievements-reset-all)
 - [games achievements reset-for-all-players](#games-achievements-reset-for-all-players)
@@ -302,6 +303,7 @@
 - [games leaderboards create](#games-leaderboards-create)
 - [games leaderboards update](#games-leaderboards-update)
 - [games leaderboards delete](#games-leaderboards-delete)
+- [games leaderboards upload-icon](#games-leaderboards-upload-icon)
 - [games scores](#games-scores)
 - [games scores reset](#games-scores-reset)
 - [games scores reset-all](#games-scores-reset-all)
@@ -7110,6 +7112,32 @@ gplay games achievements delete --achievement-id <id> --confirm
 
 ---
 
+## gplay games achievements upload-icon
+
+Upload or replace the icon for a Play Games achievement through Google's deprecated official API.
+
+```
+gplay games achievements upload-icon --achievement-id <id> --file <path> --acknowledge-deprecated-api [flags]
+```
+
+Upload or replace the icon for a Play Games achievement.
+
+Google has deprecated this official image upload API and removed it from the
+live discovery document. Calls may fail even with valid credentials and image
+data. The acknowledgement flag is required on every attempt.
+
+The icon must be a decodable 512x512 PNG or JPEG no larger than 15 MB.
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `--achievement-id` | Achievement ID | `` |
+| `--acknowledge-deprecated-api` | Acknowledge that Google's deprecated image API may reject the request | `false` |
+| `--file` | Path to a 512x512 PNG or JPEG icon | `` |
+| `--output` | Output format: json (default), table, markdown | `json` |
+| `--pretty` | Pretty-print JSON output | `false` |
+
+---
+
 ## gplay games achievements reset
 
 Reset the calling tester's progress for an achievement.
@@ -7284,6 +7312,32 @@ gplay games leaderboards delete --leaderboard-id <id> --confirm
 |------|-------------|---------|
 | `--confirm` | Confirm deletion | `false` |
 | `--leaderboard-id` | Leaderboard ID | `` |
+
+---
+
+## gplay games leaderboards upload-icon
+
+Upload or replace the icon for a Play Games leaderboard through Google's deprecated official API.
+
+```
+gplay games leaderboards upload-icon --leaderboard-id <id> --file <path> --acknowledge-deprecated-api [flags]
+```
+
+Upload or replace the icon for a Play Games leaderboard.
+
+Google has deprecated this official image upload API and removed it from the
+live discovery document. Calls may fail even with valid credentials and image
+data. The acknowledgement flag is required on every attempt.
+
+The icon must be a decodable 512x512 PNG or JPEG no larger than 15 MB.
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `--acknowledge-deprecated-api` | Acknowledge that Google's deprecated image API may reject the request | `false` |
+| `--file` | Path to a 512x512 PNG or JPEG icon | `` |
+| `--leaderboard-id` | Leaderboard ID | `` |
+| `--output` | Output format: json (default), table, markdown | `json` |
+| `--pretty` | Pretty-print JSON output | `false` |
 
 ---
 

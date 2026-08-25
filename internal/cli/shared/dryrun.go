@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"mime"
 	"net/http"
 	"strings"
 )
@@ -55,17 +56,21 @@ func (t *DryRunTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	fmt.Fprintf(w, "[DRY RUN] %s %s\n", req.Method, req.URL.String()) // #nosec G705 -- writing to stderr, not a web response
 
 	if req.Body != nil && req.Body != http.NoBody {
-		body, err := io.ReadAll(req.Body)
-		req.Body.Close()
-		if err == nil && len(body) > 0 {
-			// Truncate very large bodies (e.g., binary uploads) for readability.
-			const maxBody = 2048
-			display := string(body)
-			if len(display) > maxBody {
-				display = display[:maxBody] + "... (truncated)"
+		contentType := strings.ToLower(strings.TrimSpace(req.Header.Get("Content-Type")))
+		if isTextContentType(contentType) {
+			body, err := io.ReadAll(req.Body)
+			if err == nil && len(body) > 0 {
+				const maxBody = 2048
+				display := string(body)
+				if len(display) > maxBody {
+					display = display[:maxBody] + "... (truncated)"
+				}
+				fmt.Fprintf(w, "[DRY RUN] Body: %s\n", strings.TrimSpace(display))
 			}
-			fmt.Fprintf(w, "[DRY RUN] Body: %s\n", strings.TrimSpace(display))
+		} else {
+			fmt.Fprintf(w, "[DRY RUN] Body: non-text body omitted (%s, %d bytes)\n", contentType, req.ContentLength)
 		}
+		_ = req.Body.Close()
 	}
 
 	fmt.Fprintf(w, "[DRY RUN] No changes were made.\n")
@@ -81,4 +86,16 @@ func (t *DryRunTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 		Body:       io.NopCloser(bytes.NewBufferString("{}")),
 		Request:    req,
 	}, nil
+}
+
+func isTextContentType(contentType string) bool {
+	mediaType, _, err := mime.ParseMediaType(contentType)
+	if err != nil {
+		return false
+	}
+	if strings.HasPrefix(mediaType, "text/") {
+		return true
+	}
+	return mediaType == "application/json" ||
+		strings.HasSuffix(mediaType, "+json")
 }

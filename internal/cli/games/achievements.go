@@ -27,6 +27,7 @@ func AchievementsCommand() *ffcli.Command {
 			achievementsCreateCommand(),
 			achievementsUpdateCommand(),
 			achievementsDeleteCommand(),
+			achievementsUploadIconCommand(),
 			achievementsResetCommand(),
 			achievementsResetAllCommand(),
 			achievementsResetForAllCommand(),

@@ -9,7 +9,7 @@ for Play financial and statistics reports.
 | Android Publisher v3 | 145 | All methods; third-party-store and enterprise-KMS methods are scope-gated |
 | Play Developer Reporting v1beta1 | 25 | All methods through typed commands or `vitals metric-sets` |
 | Checks v1alpha | 15 | All methods, including repository scans |
-| Games Configuration | 10 | All methods |
+| Games Configuration | 10 | All current discovery methods; guarded legacy icon upload is documented separately |
 | Games Management | 18 | All methods; global resets require exact application confirmation |
 | Custom App Publishing | 1 | Complete |
 | Play Integrity v1 | 3 | Complete; Device Recall requires restricted-use acknowledgement |
@@ -49,6 +49,12 @@ normal invocation materializes only the selected root command family.
   and require `--application-id`, a matching `--confirm-application-id`, and
   `--confirm`. Before resetting, gplay verifies that the authenticated caller
   can read that exact Play Games application through the Configuration API.
+- `gplay games achievements upload-icon` and `gplay games leaderboards
+  upload-icon` call Google's deprecated official image media endpoint. That
+  endpoint is absent from the live discovery document and Google warns that it
+  may reject calls, so every attempt requires
+  `--acknowledge-deprecated-api`. The commands enforce 512x512 PNG/JPEG input,
+  redact binary dry-run bodies, and direct rejected uploads to Play Console.
 
 ## Testing
 

@@ -27,6 +27,7 @@ func LeaderboardsCommand() *ffcli.Command {
 			leaderboardsCreateCommand(),
 			leaderboardsUpdateCommand(),
 			leaderboardsDeleteCommand(),
+			leaderboardsUploadIconCommand(),
 		},
 		Exec: func(ctx context.Context, args []string) error {
 			return flag.ErrHelp

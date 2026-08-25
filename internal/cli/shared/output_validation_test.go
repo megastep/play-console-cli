@@ -36,6 +36,13 @@ func TestWrapCommandOutputValidation_ValidJSON(t *testing.T) {
 	}
 }
 
+func TestValidateStructuredOutputFlagsRejectsUnsupportedFormat(t *testing.T) {
+	err := ValidateStructuredOutputFlags("yaml", false)
+	if err == nil || !strings.Contains(err.Error(), "unsupported format: yaml") {
+		t.Fatalf("ValidateStructuredOutputFlags(yaml) = %v, want unsupported format error", err)
+	}
+}
+
 func TestWrapCommandOutputValidation_InvalidXML(t *testing.T) {
 	executed := false
 	fs := flag.NewFlagSet("test", flag.ContinueOnError)
@@ -59,8 +66,8 @@ func TestWrapCommandOutputValidation_InvalidXML(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error for invalid output format")
 	}
-	if !strings.Contains(err.Error(), "unsupported output format") {
-		t.Errorf("error should mention unsupported output format, got: %v", err)
+	if !strings.Contains(err.Error(), "unsupported format") {
+		t.Errorf("error should mention unsupported format, got: %v", err)
 	}
 	if executed {
 		t.Error("original Exec should NOT have been called for invalid format")

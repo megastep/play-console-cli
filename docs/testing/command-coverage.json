@@ -308,6 +308,9 @@
   "games achievements update": {
     "class": "offline"
   },
+  "games achievements upload-icon": {
+    "class": "offline"
+  },
   "games events reset": {
     "class": "offline"
   },
@@ -336,6 +339,9 @@
     "class": "offline"
   },
   "games leaderboards update": {
+    "class": "offline"
+  },
+  "games leaderboards upload-icon": {
     "class": "offline"
   },
   "games players hide": {

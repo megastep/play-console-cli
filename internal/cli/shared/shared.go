@@ -177,6 +177,19 @@ func ValidateOutputFlags(output string, pretty bool) error {
 	return nil
 }
 
+// ValidateStructuredOutputFlags validates commands that support the standard
+// JSON, table, and markdown output formats.
+func ValidateStructuredOutputFlags(output string, pretty bool) error {
+	if err := ValidateOutputFlags(output, pretty); err != nil {
+		return err
+	}
+	normalized := strings.ToLower(strings.TrimSpace(output))
+	if normalized != "" && normalized != "md" && !validOutputFormats[normalized] {
+		return fmt.Errorf("unsupported format: %s", normalized)
+	}
+	return nil
+}
+
 // ReportedError wraps errors that already have user-facing output.
 type ReportedError struct{ Err error }
 

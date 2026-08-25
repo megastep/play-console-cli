@@ -2,8 +2,6 @@ package shared
 
 import (
 	"context"
-	"fmt"
-	"strings"
 
 	"github.com/peterbourgon/ff/v3/ffcli"
 )
@@ -34,16 +32,9 @@ func WrapCommandOutputValidation(cmd *ffcli.Command) {
 			prettyFlag := cmd.FlagSet.Lookup("pretty")
 
 			if outputFlag != nil {
-				format := strings.ToLower(strings.TrimSpace(outputFlag.Value.String()))
-				validFormats := map[string]bool{"json": true, "table": true, "markdown": true, "md": true, "": true}
-				if !validFormats[format] {
-					return fmt.Errorf("unsupported output format: %s", format)
-				}
-
-				if prettyFlag != nil && prettyFlag.Value.String() == "true" {
-					if format == "table" || format == "markdown" || format == "md" {
-						return fmt.Errorf("--pretty is only valid with JSON output")
-					}
+				pretty := prettyFlag != nil && prettyFlag.Value.String() == "true"
+				if err := ValidateStructuredOutputFlags(outputFlag.Value.String(), pretty); err != nil {
+					return err
 				}
 			}
 		}
